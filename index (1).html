@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz: Accidentes Laborales 🍕</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rojo: #E63946;
+    --amarillo: #FFD166;
+    --verde: #06D6A0;
+    --azul: #118AB2;
+    --naranja: #FF6B35;
+    --oscuro: #1a1a2e;
+    --claro: #f8f9fa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--oscuro);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(230,57,70,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(17,138,178,0.15) 0%, transparent 50%);
+  }
+
+  .container { max-width: 680px; width: 100%; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .card {
+    background: white;
+    border-radius: 28px;
+    padding: 40px 36px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, var(--rojo), var(--naranja), var(--amarillo));
+  }
+
+  .pizza-header { font-size: 72px; margin-bottom: 8px; animation: bounce 1.5s infinite; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  h1 { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--oscuro); line-height: 1.2; margin-bottom: 10px; }
+  .subtitulo { color: #666; font-size: 1rem; font-weight: 600; margin-bottom: 24px; }
+
+  .badge-empresa {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--rojo), var(--naranja));
+    color: white;
+    padding: 6px 18px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+  }
+
+  .info-boxes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+  .info-box { background: var(--claro); border-radius: 16px; padding: 14px 10px; font-size: 0.82rem; font-weight: 700; color: #444; }
+  .info-box .num { font-family: 'Fredoka One', cursive; font-size: 1.6rem; display: block; color: var(--rojo); }
+
+  .input-wrap { margin-bottom: 20px; text-align: left; }
+  .input-wrap label { display: block; font-weight: 800; font-size: 0.95rem; color: var(--oscuro); margin-bottom: 8px; }
+
+  .input-wrap input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 3px solid #e0e0e0;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--oscuro);
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+    letter-spacing: 0px;
+  }
+
+  .input-wrap input:focus { border-color: var(--rojo); }
+  .input-wrap input::placeholder { color: #bbb; letter-spacing: 0; font-weight: 600; font-size: 1rem; }
+
+  .error-msg { color: var(--rojo); font-size: 0.85rem; font-weight: 700; margin-top: 8px; display: none; }
+
+  .btn-start {
+    background: linear-gradient(135deg, var(--rojo), var(--naranja));
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    border-radius: 100px;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 20px rgba(230,57,70,0.4);
+  }
+
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(230,57,70,0.5); }
+
+  /* QUIZ */
+  .progress-bar-wrap { background: rgba(255,255,255,0.1); border-radius: 100px; height: 8px; margin-bottom: 20px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--amarillo), var(--naranja)); border-radius: 100px; transition: width 0.5s ease; }
+
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 700; }
+  .puntos-display { background: var(--amarillo); color: var(--oscuro); padding: 4px 14px; border-radius: 100px; font-weight: 800; font-family: 'Fredoka One', cursive; }
+
+  .question-card { background: white; border-radius: 24px; padding: 32px 28px; box-shadow: 0 16px 48px rgba(0,0,0,0.35); margin-bottom: 16px; position: relative; overflow: hidden; }
+  .question-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--rojo), var(--naranja), var(--amarillo)); border-radius: 24px 24px 0 0; }
+
+  .q-emoji { font-size: 3rem; margin-bottom: 12px; display: block; }
+  .q-numero { font-size: 0.78rem; font-weight: 800; color: var(--rojo); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .q-texto { font-family: 'Fredoka One', cursive; font-size: 1.25rem; color: var(--oscuro); line-height: 1.4; margin-bottom: 24px; }
+
+  .opciones { display: grid; gap: 10px; }
+
+  .opcion-btn {
+    background: #f4f5f7;
+    border: 3px solid transparent;
+    border-radius: 14px;
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .opcion-btn:hover:not(:disabled) { border-color: var(--azul); background: #e8f4fd; transform: translateX(4px); }
+  .opcion-letra { background: var(--oscuro); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Fredoka One', cursive; font-size: 0.9rem; flex-shrink: 0; }
+  .opcion-btn.correcta { background: #d4f7ee; border-color: var(--verde); color: #065f46; }
+  .opcion-btn.correcta .opcion-letra { background: var(--verde); }
+  .opcion-btn.incorrecta { background: #fde8e8; border-color: var(--rojo); color: #7f1d1d; }
+  .opcion-btn.incorrecta .opcion-letra { background: var(--rojo); }
+  .opcion-btn:disabled { cursor: default; }
+
+  .feedback-box { margin-top: 14px; padding: 14px 18px; border-radius: 14px; font-weight: 700; font-size: 0.92rem; display: none; animation: slideUp 0.3s ease; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .feedback-box.correcto { background: #d4f7ee; color: #065f46; border-left: 5px solid var(--verde); display: block; }
+  .feedback-box.incorrecto { background: #fde8e8; color: #7f1d1d; border-left: 5px solid var(--rojo); display: block; }
+
+  .btn-siguiente { background: linear-gradient(135deg, var(--azul), #0a6fa8); color: white; border: none; padding: 14px 32px; font-family: 'Fredoka One', cursive; font-size: 1.1rem; border-radius: 100px; cursor: pointer; width: 100%; margin-top: 14px; display: none; transition: transform 0.2s; }
+  .btn-siguiente:hover { transform: translateY(-2px); }
+
+  /* RESULTADOS */
+  .resultado-emoji { font-size: 80px; display: block; margin-bottom: 16px; }
+  .score-circle { width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, var(--rojo), var(--naranja)); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 30px rgba(230,57,70,0.4); }
+  .score-num { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: white; line-height: 1; }
+  .score-total { color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 700; }
+  .mensaje-resultado { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--oscuro); margin-bottom: 8px; }
+  .submensaje { color: #666; font-size: 0.95rem; font-weight: 600; margin-bottom: 24px; line-height: 1.5; }
+
+  .resumen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .resumen-item { background: var(--claro); border-radius: 14px; padding: 14px; text-align: center; }
+  .resumen-item .num { font-family: 'Fredoka One', cursive; font-size: 1.8rem; display: block; }
+  .resumen-item .label { font-size: 0.78rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  .verde-txt { color: var(--verde); }
+  .rojo-txt { color: var(--rojo); }
+
+  .status-box { border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; font-weight: 700; font-size: 0.88rem; display: none; }
+  .status-box.enviando { background: #e8f4fd; color: var(--azul); display: block; }
+  .status-box.ok { background: #d4f7ee; color: #065f46; display: block; }
+  .status-box.error { background: #fde8e8; color: #7f1d1d; display: block; }
+
+  .btn-reiniciar { background: linear-gradient(135deg, var(--rojo), var(--naranja)); color: white; border: none; padding: 16px 40px; font-family: 'Fredoka One', cursive; font-size: 1.2rem; border-radius: 100px; cursor: pointer; width: 100%; transition: transform 0.2s; box-shadow: 0 6px 20px rgba(230,57,70,0.4); }
+  .btn-reiniciar:hover { transform: translateY(-2px); }
+
+  .qr-footer { text-align: center; margin-top: 18px; color: rgba(255,255,255,0.5); font-size: 0.8rem; font-weight: 700; }
+
+  @media (max-width: 480px) {
+    .card { padding: 28px 20px; }
+    h1 { font-size: 1.7rem; }
+    .q-texto { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- INICIO -->
+  <div class="screen active" id="inicio">
+    <div class="card">
+      <div class="pizza-header">🍕</div>
+      <div class="badge-empresa">⚠️ Seguridad Laboral</div>
+      <h1>¿Sabes qué hacer en un accidente?</h1>
+      <p class="subtitulo">Pon a prueba tu conocimiento del protocolo de accidentes de nuestra fábrica</p>
+      <div class="info-boxes">
+        <div class="info-box"><span class="num">8</span>preguntas</div>
+        <div class="info-box"><span class="num">⏱</span>3 min.</div>
+        <div class="info-box"><span class="num">🏆</span>¡puntúa!</div>
+      </div>
+      <div class="input-wrap">
+        <label for="nom-empleado">👷 Nombre del empleado</label>
+        <input type="text" id="nom-empleado" placeholder="Ej: Ana García" maxlength="50"
+          onkeydown="if(event.key==='Enter') validarYEmpezar()" />
+        <div class="error-msg" id="error-empleado">⚠️ Introduce tu nombre para continuar.</div>
+      </div>
+      <button class="btn-start" onclick="validarYEmpezar()">¡Empezar ahora! 🚀</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quiz">
+    <div class="quiz-header">
+      <span id="q-contador">Pregunta 1 de 8</span>
+      <span class="puntos-display">⭐ <span id="puntos">0</span> pts</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+    <div class="question-card">
+      <span class="q-emoji" id="q-emoji">🤔</span>
+      <div class="q-numero" id="q-numero">Pregunta 1</div>
+      <div class="q-texto" id="q-texto"></div>
+      <div class="opciones" id="opciones"></div>
+      <div class="feedback-box" id="feedback"></div>
+      <button class="btn-siguiente" id="btn-siguiente" onclick="siguientePregunta()">Siguiente ➜</button>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="screen" id="resultado">
+    <div class="card">
+      <span class="resultado-emoji" id="res-emoji">🏆</span>
+      <div class="score-circle">
+        <div class="score-num" id="score-num">0</div>
+        <div class="score-total" id="score-total">de 8</div>
+      </div>
+      <div class="mensaje-resultado" id="res-mensaje"></div>
+      <p class="submensaje" id="res-submensaje"></p>
+      <div class="resumen-grid">
+        <div class="resumen-item"><span class="num verde-txt" id="res-correctas">0</span><span class="label">✅ Correctas</span></div>
+        <div class="resumen-item"><span class="num rojo-txt" id="res-incorrectas">0</span><span class="label">❌ Incorrectas</span></div>
+        <div class="resumen-item"><span class="num" id="res-puntos" style="color:var(--naranja)">0</span><span class="label">⭐ Puntos</span></div>
+        <div class="resumen-item"><span class="num" id="res-nota" style="color:var(--azul)">-</span><span class="label">📊 Nota</span></div>
+      </div>
+      <div class="status-box" id="status-box"></div>
+      <button class="btn-reiniciar" onclick="reiniciar()">🔄 Volver a intentarlo</button>
+    </div>
+  </div>
+
+  <div class="qr-footer">Escanea el QR para participar · Seguridad es cosa de todos 🍕</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// ⚙️  PASO FINAL: pega aquí la URL de tu Google Apps Script
+// ═══════════════════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx2-b1jZKI4aDsZ0BldamJ2KhJHST5tZJK1_psCfQe0sN7U4HVd5rq9Ir3AOp_sBiyyDA/exec';
+// ═══════════════════════════════════════════════════════════
+
+const preguntas = [
+  {
+    emoji:"🚨", texto:"Sufres un corte en la mano mientras trabajas. ¿Cuál es el PRIMER paso que debes dar?",
+    opciones:["Terminar lo que estás haciendo y avisar al final del turno","Comunicarlo inmediatamente al supervisor o responsable de turno","Ir directamente al hospital por tu cuenta","Ponerte una tirita y seguir trabajando sin avisar"],
+    correcta:1,
+    feedbackOk:"¡Correcto! 🎉 Hay que avisar INMEDIATAMENTE al responsable de turno, sea leve, grave o muy grave.",
+    feedbackFail:"❌ Siempre debes comunicar el accidente de inmediato al supervisor o responsable de turno, sin esperar."
+  },
+  {
+    emoji:"📋", texto:"Tu supervisor decide que necesitas ir a la mutua. ¿Qué documento te tiene que dar?",
+    opciones:["Una carta de despido","El parte de trabajo del día","El volante de asistencia de la mutua ASEPEYO cumplimentado y firmado","Un justificante de puntualidad"],
+    correcta:2,
+    feedbackOk:"¡Perfecto! 🎉 El supervisor debe darte el volante de asistencia con la mutua laboral ASEPEYO.",
+    feedbackFail:"❌ El documento correcto es el volante de asistencia con la mutua ASEPEYO, firmado y cumplimentado."
+  },
+  {
+    emoji:"🏥", texto:"¿Cuál es el nombre de la mutua laboral de nuestra empresa para accidentes de trabajo?",
+    opciones:["Mapfre Salud","Sanitas Empresas","ASEPEYO","Adeslas Trabajo"],
+    correcta:2,
+    feedbackOk:"¡Así es! 🎉 Nuestra mutua laboral es ASEPEYO. ¡Apúntalo bien!",
+    feedbackFail:"❌ La mutua laboral de nuestra empresa es ASEPEYO. ¡Es importante saberlo!"
+  },
+  {
+    emoji:"🚗", texto:"Tienes un accidente y no puedes ir por tu cuenta al centro asistencial. ¿Qué hace la empresa?",
+    opciones:["Te pide que llames a un familiar","Te ofrece vías de transporte alternativas como taxi o ambulancia","Te dice que esperes hasta el día siguiente","Te da dinero para el metro"],
+    correcta:1,
+    feedbackOk:"¡Correcto! 🚕 Si no puedes desplazarte, la empresa te facilita taxi, ambulancia u otros medios.",
+    feedbackFail:"❌ La empresa tiene la obligación de ofrecer transporte alternativo si no puedes ir por tu cuenta."
+  },
+  {
+    emoji:"📱", texto:"El médico de ASEPEYO te da la baja. ¿Dónde debes registrar los días de ausencia?",
+    opciones:["En un papel que entregas en Recursos Humanos","Enviando un WhatsApp al jefe","En la aplicación Factorial","No hace falta registrarlo"],
+    correcta:2,
+    feedbackOk:"¡Genial! 📲 Las bajas por accidente laboral se registran en la aplicación Factorial.",
+    feedbackFail:"❌ Debes colgar la baja en la aplicación Factorial, igual que cualquier otra baja médica."
+  },
+  {
+    emoji:"⏰", texto:"¿Cuál de estos centros ASEPEYO está abierto las 24 horas, los 7 días de la semana?",
+    opciones:["Sant Boi de Llobregat (Carrer de Sant Joan Bosco, 38)","L'Hospitalet de Llobregat (Av. del Carrilet, 223)","El Prat de Llobregat (Plaça Mestre Estalella)","Via Augusta, 18 – Gràcia, Barcelona"],
+    correcta:3,
+    feedbackOk:"¡Correcto! 🌙 El centro de Via Augusta (Gràcia) está abierto 24/7, de lunes a domingo.",
+    feedbackFail:"❌ El único centro abierto 24h los 7 días es el de Via Augusta, 18 en Gràcia, Barcelona."
+  },
+  {
+    emoji:"🤕", texto:"Tienes una visita médica programada (no urgencia). ¿Cómo lo registras en Factorial?",
+    opciones:["Como 'Baja médica'","Como 'Visita Médico' en el apartado de ausencias","No hace falta si duras menos de 2 horas","Como 'Vacaciones'"],
+    correcta:1,
+    feedbackOk:"¡Exacto! 📅 Las visitas médicas se registran como 'Visita Médico' con justificante.",
+    feedbackFail:"❌ En Factorial debes seleccionar 'Visita Médico' en ausencias, indicar el horario y adjuntar el justificante."
+  },
+  {
+    emoji:"🔄", texto:"Tu baja por accidente se alarga más días. ¿Qué debes hacer en Factorial?",
+    opciones:["Crear una nueva ausencia desde cero","No hace falta hacer nada, se actualiza solo","Actualizar las fechas de ausencia conforme a la nueva baja médica","Llamar a RRHH para que lo hagan ellos"],
+    correcta:2,
+    feedbackOk:"¡Perfecto! ✅ Debes actualizar las fechas en Factorial según el parte de baja actualizado.",
+    feedbackFail:"❌ Debes actualizar manualmente las fechas en Factorial y verificar que el boletín del CAP cuadra."
+  }
+];
+
+let preguntaActual=0, puntos=0, correctas=0, incorrectas=0, respondida=false, nomEmpleado='';
+
+function validarYEmpezar() {
+  const v = document.getElementById('nom-empleado').value.trim();
+  if (!v) { document.getElementById('error-empleado').style.display='block'; document.getElementById('nom-empleado').focus(); return; }
+  document.getElementById('error-empleado').style.display='none';
+  nomEmpleado = v;
+  preguntaActual=0; puntos=0; correctas=0; incorrectas=0; respondida=false;
+  mostrarPantalla('quiz');
+  cargarPregunta();
+}
+
+function mostrarPantalla(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function cargarPregunta() {
+  respondida=false;
+  const p=preguntas[preguntaActual], total=preguntas.length;
+  document.getElementById('q-contador').textContent=`Pregunta ${preguntaActual+1} de ${total}`;
+  document.getElementById('puntos').textContent=puntos;
+  document.getElementById('progress-bar').style.width=`${(preguntaActual/total)*100}%`;
+  document.getElementById('q-emoji').textContent=p.emoji;
+  document.getElementById('q-numero').textContent=`Pregunta ${preguntaActual+1}`;
+  document.getElementById('q-texto').textContent=p.texto;
+  const div=document.getElementById('opciones'); div.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opcion-btn';
+    btn.innerHTML=`<span class="opcion-letra">${l}</span><span>${p.opciones[i]}</span>`;
+    btn.onclick=()=>responder(i);
+    div.appendChild(btn);
+  });
+  document.getElementById('feedback').className='feedback-box';
+  document.getElementById('feedback').innerHTML='';
+  document.getElementById('btn-siguiente').style.display='none';
+}
+
+function responder(idx) {
+  if(respondida) return; respondida=true;
+  const p=preguntas[preguntaActual];
+  const btns=document.querySelectorAll('.opcion-btn');
+  btns.forEach(b=>b.disabled=true);
+  btns[p.correcta].classList.add('correcta');
+  const fb=document.getElementById('feedback');
+  if(idx===p.correcta) {
+    puntos+=10; correctas++;
+    document.getElementById('puntos').textContent=puntos;
+    fb.innerHTML=`✅ ${p.feedbackOk}`; fb.className='feedback-box correcto';
+  } else {
+    incorrectas++; btns[idx].classList.add('incorrecta');
+    fb.innerHTML=`❌ ${p.feedbackFail}`; fb.className='feedback-box incorrecto';
+  }
+  const btn=document.getElementById('btn-siguiente');
+  btn.style.display='block';
+  btn.textContent=preguntaActual<preguntas.length-1?'Siguiente ➜':'Ver resultados 🏆';
+}
+
+function siguientePregunta() {
+  preguntaActual++;
+  preguntaActual>=preguntas.length ? mostrarResultados() : cargarPregunta();
+}
+
+function mostrarResultados() {
+  mostrarPantalla('resultado');
+  const total=preguntas.length, pct=Math.round((correctas/total)*100);
+  document.getElementById('score-num').textContent=correctas;
+  document.getElementById('score-total').textContent=`de ${total}`;
+  document.getElementById('res-correctas').textContent=correctas;
+  document.getElementById('res-incorrectas').textContent=incorrectas;
+  document.getElementById('res-puntos').textContent=puntos;
+  document.getElementById('res-nota').textContent=pct+'%';
+  const map=[
+    [100,'🏆','¡Campeón/a de la seguridad!','Conoces el protocolo al 100%. ¡Eres un ejemplo para todo el equipo!'],
+    [75,'🎉','¡Muy bien hecho!','Tienes un buen conocimiento del protocolo. Repasa las que fallaste para ser un experto/a.'],
+    [50,'💪','¡Vas por buen camino!','Conoces parte del protocolo, pero hay puntos importantes que repasar. ¡Inténtalo de nuevo!'],
+    [0,'📚','¡Toca repasar!','El protocolo de accidentes es muy importante para tu seguridad. Te animamos a repasarlo y volver a intentarlo.']
+  ];
+  const [,emoji,msg,sub]=map.find(([t])=>pct>=t);
+  document.getElementById('res-emoji').textContent=emoji;
+  document.getElementById('res-mensaje').textContent=msg;
+  document.getElementById('res-submensaje').textContent=sub;
+  enviarResultados(pct);
+}
+
+function enviarResultados(pct) {
+  if(SCRIPT_URL==='PEGA_AQUI_TU_URL') return;
+  const box=document.getElementById('status-box');
+  box.className='status-box enviando'; box.textContent='📤 Guardando tu resultado...';
+  const now=new Date();
+  fetch(SCRIPT_URL, {
+    method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      empleado: nomEmpleado,
+      fecha: now.toLocaleDateString('es-ES'),
+      hora: now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
+      correctas, incorrectas, puntos, nota: pct+'%'
+    })
+  })
+  .then(()=>{ box.className='status-box ok'; box.textContent='✅ ¡Resultado guardado correctamente!'; })
+  .catch(()=>{ box.className='status-box error'; box.textContent='⚠️ No se pudo guardar. Avisa a RRHH.'; });
+}
+
+function reiniciar() {
+  mostrarPantalla('inicio');
+  document.getElementById('nom-empleado').value='';
+}
+</script>
+</body>
+</html>
