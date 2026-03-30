@@ -93,7 +93,7 @@
     outline: none;
     transition: border-color 0.2s;
     text-align: center;
-    letter-spacing: 3px;
+    letter-spacing: 0px;
   }
 
   .input-wrap input:focus { border-color: var(--rojo); }
@@ -214,10 +214,10 @@
         <div class="info-box"><span class="num">🏆</span>¡puntúa!</div>
       </div>
       <div class="input-wrap">
-        <label for="num-empleado">👷 Número de empleado</label>
-        <input type="text" id="num-empleado" placeholder="Ej: 00123" maxlength="10"
+        <label for="nom-empleado">👷 Nombre del empleado</label>
+        <input type="text" id="nom-empleado" placeholder="Ej: Ana García" maxlength="50"
           onkeydown="if(event.key==='Enter') validarYEmpezar()" />
-        <div class="error-msg" id="error-empleado">⚠️ Introduce tu número de empleado para continuar.</div>
+        <div class="error-msg" id="error-empleado">⚠️ Introduce tu nombre para continuar.</div>
       </div>
       <button class="btn-start" onclick="validarYEmpezar()">¡Empezar ahora! 🚀</button>
     </div>
@@ -332,13 +332,13 @@ const preguntas = [
   }
 ];
 
-let preguntaActual=0, puntos=0, correctas=0, incorrectas=0, respondida=false, numEmpleado='';
+let preguntaActual=0, puntos=0, correctas=0, incorrectas=0, respondida=false, nomEmpleado='';
 
 function validarYEmpezar() {
-  const v = document.getElementById('num-empleado').value.trim();
-  if (!v) { document.getElementById('error-empleado').style.display='block'; document.getElementById('num-empleado').focus(); return; }
+  const v = document.getElementById('nom-empleado').value.trim();
+  if (!v) { document.getElementById('error-empleado').style.display='block'; document.getElementById('nom-empleado').focus(); return; }
   document.getElementById('error-empleado').style.display='none';
-  numEmpleado = v;
+  nomEmpleado = v;
   preguntaActual=0; puntos=0; correctas=0; incorrectas=0; respondida=false;
   mostrarPantalla('quiz');
   cargarPregunta();
@@ -427,7 +427,7 @@ function enviarResultados(pct) {
     method:'POST', mode:'no-cors',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      empleado: numEmpleado,
+      empleado: nomEmpleado,
       fecha: now.toLocaleDateString('es-ES'),
       hora: now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
       correctas, incorrectas, puntos, nota: pct+'%'
@@ -439,7 +439,7 @@ function enviarResultados(pct) {
 
 function reiniciar() {
   mostrarPantalla('inicio');
-  document.getElementById('num-empleado').value='';
+  document.getElementById('nom-empleado').value='';
 }
 </script>
 </body>
